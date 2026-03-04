@@ -181,7 +181,7 @@ def identify_loans(transactions):
     for line in transactions:
         line_upper = line.upper()
 
-        # Verifica se alguma palavra-chave de empréstimo está presente na linha
+        # Verifica se alguma palavra-chave de themeempréstimo está presente na linha
         if not any(kw in line_upper for kw in MCA_KEYWORDS):
             continue
 
