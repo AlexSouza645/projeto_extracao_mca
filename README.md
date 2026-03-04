@@ -4,51 +4,36 @@ A specialized Python tool designed to automate the extraction of Merchant Cash A
 
 ---
 
-## 🛠️ Installation & Setup (Windows)
+## 🛠️ Installation & Setup (Windows & macOS)
 
-To run this tool on Windows, follow these simple steps:
+### 1. Install Python
+- **Windows:** Download the latest installer from [python.org](https://www.python.org/downloads/windows/).  
+  **⚠️ CRITICAL:** During installation, you MUST check the box **"Add Python to PATH"** at the bottom of the first screen.
+- **macOS:** Download the macOS installer from [python.org](https://www.python.org/downloads/macos/) or use Homebrew (`brew install python`).
 
-1. **Install Python**:
-   If you don't have Python installed, download and install the latest version from [python.org](https://www.python.org/downloads/windows/).  
-   **⚠️ IMPORTANT**: During installation, make sure to check the box **"Add Python to PATH"**.
+### 2. Download the Project
+Download the source code and extract it to a folder of your choice (e.g., `Documents/MCA-Extractor`).
 
-2. **Download the Project**:
-   Download the source code and extract it to a folder of your choice (e.g., `C:\MCA-Extractor`).
+### 3. Open Terminal
+Navigate to your project folder using your system's terminal:
+- **Windows:** Open **PowerShell** and run `cd C:\Path\To\MCA-Extractor`
+- **macOS / Linux:** Open **Terminal** and run `cd ~/Path/To/MCA-Extractor`
 
-3. **Open Terminal**:
-   Open **PowerShell** or **Command Prompt** (Cmd) and navigate to your project folder:
+### 4. Install Dependencies
+Run the following command to install the required libraries permanently to your system python:
 
-   ```cmd
-   cd C:\MCA-Extractor
-   ```
-
-4. **Create a Virtual Environment** (Recommended):
-   This keeps the project dependencies isolated from your system:
-
-   ```cmd
-   python -m venv .venv
-   ```
-
-5. **Activate the Virtual Environment**:
-
-   ```cmd
-   .venv\Scripts\activate
-   ```
-
-   _(You should see `(.venv)` appear at the beginning of your command line)_.
-
-6. **Install Required Libraries**:
-   ```cmd
-   pip install -r requirements.txt
-   ```
+```bash
+python -m pip install -r requirements.txt
+```
+*(Note for macOS: You might need to type `python3` instead of `python` and `pip3` instead of `pip` in your terminal).*
 
 ---
 
-## 📖 How to Run on Windows
+## 📖 How to Run the Extractor
 
-1. Ensure your virtual environment is active.
-2. Start the application:
-   ```cmd
+1. Open your terminal in the project folder.
+2. Start the application by running:
+   ```bash
    python app.py
    ```
 3. A menu will appear asking for the **Processing Mode**:
@@ -62,15 +47,29 @@ To run this tool on Windows, follow these simple steps:
 
 - The report is saved as **`MCA_Final_Report.xlsx`** in the project folder.
 - You can open this file directly in **Microsoft Excel**.
-- **⚠️ NOTE**: Close the Excel file before running the script, otherwise, the program will crash when trying to save new data.
+- **⚠️ NOTE**: **Close the Excel file before running the script**, otherwise, the program will crash when trying to save new data.
 - The system also creates a **`MCA_processed_files.json`** file to keep track of which PDFs have already been analyzed to prevent duplicate entries.
+
+---
+
+## 🔍 Troubleshooting PDFs (`diagnostico.py`)
+
+Sometimes, banks provide PDFs that are actually just scanned images, containing no selectable text. The MCA extractor cannot read scanned images without OCR.
+
+To test if a batch of PDFs are readable or if they are just images:
+1. Place the PDFs you want to test inside the `arquivos/` folder inside the project.
+2. Run the diagnostic tool:
+   ```bash
+   python diagnostico.py
+   ```
+3. The tool will check all PDFs inside the `arquivos/` folder and tell you if they contain **Native Text (✓)** or if they are **Scanned (✗)**.
 
 ---
 
 ## 🚀 Key Features
 
+- **Cross-Platform**: Works flawlessly on Windows, macOS, and Linux.
 - **Standardized Output**: 50-column Excel report compatible with US financial standards.
 - **Smart Detection**: Identifies potential MCA payments (LOAN, FUNDING, ADVANCE, etc.).
 - **Automatic Deduplication**: Warns you if an attempt is made to process the same PDF twice.
 - **Cumulative Mode**: New data is added to the same spreadsheet without overwriting old records.
-- **English UI with Portuguese Comments**: Built for American clients, with code comments in Portuguese for developer study.

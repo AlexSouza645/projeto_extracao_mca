@@ -93,9 +93,18 @@ def extract_client_data(pdf_path):
         match = re.search(r'\d{3}-\d{2}-\d{4}', text)
         if match: data['SSN'] = match.group(0)
 
-        # Usa a primeira linha não vazia do PDF como nome da empresa (heurística básica)
+        # Usa a primeira linha não vazia do PDF como nome da empresa (heurística aprimorada)
         lines = [line.strip() for line in text.split('\n') if line.strip()]
-        if lines:
+        
+        # Ignora cabeçalhos genéricos de bancos para tentar achar o nome real do cliente ou empresa
+        ignore_words = ["STATEMENT", "PAGE", "BANK", "JPMORGAN", "CHASE", "FARGO", "AMERICA", "WELLS"]
+        for line in lines:
+            if not any(word in line.upper() for word in ignore_words) and len(line) > 3:
+                data['Company Name'] = line[:50]
+                break
+                
+        # Fallback se não achou nada válido
+        if data['Company Name'] == 'Not found' and lines:
             data['Company Name'] = lines[0][:50]
 
         # Heurística para capturar o endereço (Rua, Cidade, Estado, CEP) e Nome do Dono
@@ -187,7 +196,15 @@ def identify_loans(transactions):
 
         # Tenta extrair o valor financeiro da linha (ex: $1,234.56 ou -45.00)
         amounts = re.findall(r'[\-\$]?\s?\d{1,3}(?:,\d{3})*(?:\.\d{2})', line)
-        amount = amounts[-1] if amounts else "Amount not found"
+        
+        amount = "Amount not found"
+        if amounts:
+            # Em extratos, o último valor geralmente é o saldo final (Balance), e o penúltimo é o valor da transação (Amount)
+            # Se houver mais de um valor financeiro, pegamos o penúltimo para evitar falso positivo com o Saldo.
+            if len(amounts) >= 2:
+                amount = amounts[-2]
+            else:
+                amount = amounts[0]
 
         # Captura qual palavra-chave ativou a detecção
         keyword = [kw for kw in MCA_KEYWORDS if kw in line_upper][0]
@@ -386,7 +403,7 @@ def run():
         save_registry(registry)
         print(f"  -> Registry updated: {len(registry)} PDF(s) in history.")
 
-        print(f"\nDONE! ✓ '{OUTPUT_FILE}' now has {len(df_final)} client(s) in total.")
+        print(f"\nDONE! '{OUTPUT_FILE}' now has {len(df_final)} client(s) in total.")
         messagebox.showinfo(
             "Completed!",
             f"Processing completed successfully!\n\n"
